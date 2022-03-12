@@ -8,6 +8,6 @@ class Project(models.Model):
     goal = models.IntegerField()
     image = models.URLField()
     is_open = models.BooleanField()
-    date_created = models.DateField()
+    date_created = models.DateTimeField()
     owner = models.CharField(max_length=200)
 
