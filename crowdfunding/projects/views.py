@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Project, Pledge, Tag
-from. serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer, TagSerializer
+from .models import Project, Pledge, Tag, Question, Answer
+from. serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer, TagSerializer, QuestionSerializer, AnswerSerializer
 from django.http import Http404
 from rest_framework import status, permissions
 from .permissions import IsOwnerorReadOnly
@@ -98,5 +98,40 @@ class TagDetail(APIView):
             status=status.HTTP_400_BAD_REQUEST)
 
 
+class QuestionDetail(APIView):
+
+    def get(self, request):
+        questions = Question.objects.all()
+        serializer = QuestionSerializer(questions, many=True)
+        return Response(serializer.data)
+        
+    def post(self, request):
+        serializer = QuestionSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED)
+        
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST)
 
 
+class AnswerDetail(APIView):
+    def get(self, request):
+        answers = Answer.objects.all()
+        serializer = AnswerSerializer(questions, many=True)
+        return Response(serializer.data)
+        
+    def post(self, request):
+        serializer = AnswerSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED)
+        
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST)

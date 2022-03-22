@@ -1,7 +1,7 @@
 from unicodedata import category
 from unittest.util import _MAX_LENGTH
 from rest_framework import serializers
-from .models import Project, Pledge, Tag
+from .models import Project, Pledge, Tag, Question, Answer
 
 class TagSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
@@ -11,6 +11,26 @@ class TagSerializer(serializers.Serializer):
     def create(self, validated_data):
         return Tag.objects.create(**validated_data)
 
+class QuestionSerializer(serializers.Serializer):
+    id = serializers.ReadOnlyField()
+    project_id = serializers.IntegerField()
+    anonymous = serializers.BooleanField()
+    question_text = serializers.CharField()
+    pub_date = serializers.DateTimeField()
+
+    def create(self, validated_data):
+        return Question.objects.create(**validated_data)
+
+class AnswerSerializer(serializers.Serializer):
+    id = serializers.ReadOnlyField()
+    project_id = serializers.IntegerField()
+    question_id = serializers.IntegerField()
+    owner =  serializers.ReadOnlyField(source = 'owner.id')
+    answer_text = serializers.CharField()
+    pub_date = serializers.DateTimeField()
+
+    def create(self, validated_data):
+        return Answer.objects.create(**validated_data)
 
 class PledgeSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
