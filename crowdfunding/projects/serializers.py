@@ -1,6 +1,16 @@
+from unicodedata import category
 from unittest.util import _MAX_LENGTH
 from rest_framework import serializers
-from .models import Project, Pledge
+from .models import Project, Pledge, Tag
+
+class TagSerializer(serializers.Serializer):
+    id = serializers.ReadOnlyField()
+    slug = serializers.SlugField()
+    title = serializers.CharField(max_length=200, default=None)
+
+    def create(self, validated_data):
+        return Tag.objects.create(**validated_data)
+
 
 class PledgeSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
@@ -22,8 +32,10 @@ class ProjectSerializer(serializers.Serializer):
     image = serializers.URLField()
     is_open = serializers.BooleanField()
     date_created = serializers.DateTimeField()
-    # owner = serializers.CharField(max_length=200)
+    date_closed = serializers.DateTimeField()
+    category = TagSerializer(many=True, read_only = True)
     owner =  serializers.ReadOnlyField(source = 'owner.id')
+    # owner = serializers.CharField(max_length=200)
     # pledges = PledgeSerializer(many=True, read_only=True)
 
     def create(self, validated_data):
@@ -39,6 +51,9 @@ class ProjectDetailSerializer(ProjectSerializer):
         instance.image = validated_data.get('image', instance.image)
         instance.is_open = validated_data.get('is_open', instance.is_open)
         instance.date_created = validated_data.get('date_created', instance.date_created)
+        instance.category = validated_data.get('category', instance.category)
         instance.owner = validated_data.get('owner', instance.owner)
         instance.save()
         return instance
+
+
