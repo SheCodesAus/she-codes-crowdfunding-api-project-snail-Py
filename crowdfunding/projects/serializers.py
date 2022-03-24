@@ -6,24 +6,27 @@ from .models import Project, Pledge, Tag, Question, Answer
 class TagSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
     slug = serializers.SlugField()
-    title = serializers.CharField(max_length=200, default=None)
+    name = serializers.CharField(max_length=200, default=None)
 
     def create(self, validated_data):
         return Tag.objects.create(**validated_data)
 
+
+
 class QuestionSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
-    project_id = serializers.IntegerField()
+    project = serializers.IntegerField()
     anonymous = serializers.BooleanField()
     question_text = serializers.CharField()
     pub_date = serializers.DateTimeField()
+    supporter =  serializers.CharField()
 
     def create(self, validated_data):
         return Question.objects.create(**validated_data)
 
 class AnswerSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
-    project_id = serializers.IntegerField()
+    # project = serializers.IntegerField()
     question_id = serializers.IntegerField()
     owner =  serializers.ReadOnlyField(source = 'owner.id')
     answer_text = serializers.CharField()
@@ -53,8 +56,9 @@ class ProjectSerializer(serializers.Serializer):
     is_open = serializers.BooleanField()
     date_created = serializers.DateTimeField()
     date_closed = serializers.DateTimeField()
-    category = TagSerializer(many=True, read_only = True)
     owner =  serializers.ReadOnlyField(source = 'owner.id')
+    category = serializers.SlugRelatedField(slug_field = "slug",queryset = Tag.objects.all())
+    # category = TagSerializer(many=True, read_only = True)
     # owner = serializers.CharField(max_length=200)
     # pledges = PledgeSerializer(many=True, read_only=True)
 
@@ -77,3 +81,5 @@ class ProjectDetailSerializer(ProjectSerializer):
         return instance
 
 
+class TagDetailSerializer(TagSerializer):
+    projects = ProjectSerializer (many = True)

@@ -1,9 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Project, Pledge, Tag, Question, Answer
-from. serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer, TagSerializer, QuestionSerializer, AnswerSerializer
+from. serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer, TagSerializer, QuestionSerializer, AnswerSerializer, TagDetailSerializer
 from django.http import Http404
-from rest_framework import status, permissions
+from rest_framework import status, permissions, generics
 from .permissions import IsOwnerorReadOnly
 
 class PledgeList(APIView):
@@ -79,11 +79,19 @@ class ProjectDetail(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class TagList(generics.ListCreateAPIView):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
 
 class TagDetail(APIView):
 
-    def get(self, request):
-        model = Tag
+    # def get(self, request):
+    #     model = Tag
+
+    def get(self, request, slug):
+        tag = Tag.objects.get(slug = slug)
+        serializer = TagDetailSerializer(tag, many=False)
+        return Response(serializer.data)
     
     def post(self,request):
         serializer = TagSerializer(data=request.data)

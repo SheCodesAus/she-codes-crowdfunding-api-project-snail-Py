@@ -4,7 +4,7 @@ from django.utils import timezone
 
 class Tag(models.Model):
     slug = models.SlugField()
-    title = models.CharField(max_length=200, default=None)
+    name = models.CharField(max_length=200, default=None)
     
     def __str__(self) -> str:
         return self.slug
@@ -12,6 +12,7 @@ class Tag(models.Model):
 class Question(models.Model):
     question_text = models.CharField(max_length=200)
     pub_date = models.DateTimeField('date published')
+    anonymous = models.BooleanField()
 
     def __str__(self):
         return self.question_text
@@ -45,7 +46,7 @@ class Project(models.Model):
     # owner = models.CharField(max_length=200)
     category = models.ForeignKey(
         Tag, on_delete=models.SET_NULL,
-        null=True, blank=True, related_name='category'
+        null=True, blank=True, related_name='projects'
     )
     
 class Pledge(models.Model):
