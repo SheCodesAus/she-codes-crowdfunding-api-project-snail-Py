@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Project, Pledge, Tag, Question, Answer
-from. serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer, TagSerializer, QuestionSerializer, AnswerSerializer, TagDetailSerializer
+from .models import Faq, Milestone, Project, Pledge, Tag
+from. serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer, TagSerializer, FaqSerializer, TagDetailSerializer, MilestoneSerializer
 from django.http import Http404
 from rest_framework import status, permissions, generics
 from .permissions import IsOwnerorReadOnly
@@ -106,15 +106,22 @@ class TagDetail(APIView):
             status=status.HTTP_400_BAD_REQUEST)
 
 
-class QuestionDetail(APIView):
+class FaqList(APIView):
+
+# Only project owner can answer questions
+# Only users can ask questions
+# Anyone can see questions and answers
+
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
 
     def get(self, request):
-        questions = Question.objects.all()
-        serializer = QuestionSerializer(questions, many=True)
+        faqs = Faq.objects.all()
+        serializer = FaqSerializer(faqs, many=True)
         return Response(serializer.data)
         
     def post(self, request):
-        serializer = QuestionSerializer(data=request.data)
+        serializer = FaqSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(
@@ -125,15 +132,49 @@ class QuestionDetail(APIView):
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST)
 
+class FaqDetail(APIView):
 
-class AnswerDetail(APIView):
+    def get_object(self, request, pk):
+
+        try:
+            answers = Faq.objects.get(pk=pk)
+            self.check_object_permissions(self.request,answers)
+            return answers
+
+        except Project.DoesNotExist:
+            raise Http404
+    
+    def get(self, request, pk):
+        answers = self.get_object(pk)
+        serializer = FaqSerializer(answers)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        answers = self.get_object(pk)
+        data = request.data
+        serializer = FaqSerializer(
+            instance = answers,
+            data = data,
+            partial = True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MilestoneList(APIView):
+
+# Only project owner can create and edit milestones
+
     def get(self, request):
-        answers = Answer.objects.all()
-        serializer = AnswerSerializer(questions, many=True)
+        milestones = Milestone.objects.all()
+        # answers = 
+        serializer = MilestoneSerializer(milestones, many=True)
         return Response(serializer.data)
         
     def post(self, request):
-        serializer = AnswerSerializer(data=request.data)
+        serializer = MilestoneSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(

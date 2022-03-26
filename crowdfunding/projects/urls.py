@@ -8,8 +8,9 @@ urlpatterns = [
     path('pledges/', views.PledgeList.as_view()),
     path('tag/', views.TagList.as_view(), name='tag-list'),
     path('tag/<slug:slug>/', views.TagDetail.as_view(), name='tag-detail'),
-    path('<int:project_id>/questions/', views.QuestionDetail.as_view()),
-    path('<int:project_id>/answers/', views.AnswerDetail.as_view())
+    path('faq/<int:pk>', views.FaqDetail.as_view()),
+    path('faq/', views.FaqList.as_view()),
+    path('milestone/', views.MilestoneList.as_view()),
 
     ]
 

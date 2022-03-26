@@ -1,7 +1,8 @@
 from unicodedata import category
 from unittest.util import _MAX_LENGTH
 from rest_framework import serializers
-from .models import Project, Pledge, Tag, Question, Answer
+from .models import Project, Pledge, Tag, Faq, Milestone
+from users.models import CustomUser
 
 class TagSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
@@ -11,29 +12,17 @@ class TagSerializer(serializers.Serializer):
     def create(self, validated_data):
         return Tag.objects.create(**validated_data)
 
-
-
-class QuestionSerializer(serializers.Serializer):
+class FaqSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
-    project = serializers.IntegerField()
-    anonymous = serializers.BooleanField()
+    project = serializers.PrimaryKeyRelatedField(read_only = True)
     question_text = serializers.CharField()
+    answer_text = serializers.CharField()        
     pub_date = serializers.DateTimeField()
-    supporter =  serializers.CharField()
+    anonymous = serializers.BooleanField()
+    supporter =  serializers.PrimaryKeyRelatedField(queryset = CustomUser.objects.all())
 
     def create(self, validated_data):
-        return Question.objects.create(**validated_data)
-
-class AnswerSerializer(serializers.Serializer):
-    id = serializers.ReadOnlyField()
-    # project = serializers.IntegerField()
-    question_id = serializers.IntegerField()
-    owner =  serializers.ReadOnlyField(source = 'owner.id')
-    answer_text = serializers.CharField()
-    pub_date = serializers.DateTimeField()
-
-    def create(self, validated_data):
-        return Answer.objects.create(**validated_data)
+        return Faq.objects.create(**validated_data)
 
 class PledgeSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
@@ -58,6 +47,7 @@ class ProjectSerializer(serializers.Serializer):
     date_closed = serializers.DateTimeField()
     owner =  serializers.ReadOnlyField(source = 'owner.id')
     category = serializers.SlugRelatedField(slug_field = "slug",queryset = Tag.objects.all())
+    # faq = serializers.CharField()
     # category = TagSerializer(many=True, read_only = True)
     # owner = serializers.CharField(max_length=200)
     # pledges = PledgeSerializer(many=True, read_only=True)
@@ -80,6 +70,15 @@ class ProjectDetailSerializer(ProjectSerializer):
         instance.save()
         return instance
 
-
 class TagDetailSerializer(TagSerializer):
     projects = ProjectSerializer (many = True)
+
+
+class MilestoneSerializer(serializers.Serializer):
+    id = serializers.ReadOnlyField()
+    title = serializers.CharField()
+    description = serializers.CharField()
+    project = serializers.IntegerField()
+
+    def create(self, validated_data):
+        return Milestone.objects.create(**validated_data)

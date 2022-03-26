@@ -9,26 +9,6 @@ class Tag(models.Model):
     def __str__(self) -> str:
         return self.slug
 
-class Question(models.Model):
-    question_text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField('date published')
-    anonymous = models.BooleanField()
-
-    def __str__(self):
-        return self.question_text
-
-
-class Answer(models.Model):
-    answer_text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField('date published')
-    question = models.ForeignKey(
-        'Question', on_delete=models.CASCADE,
-        related_name='answer'
-    )
-
-    def __str__(self):
-        return self.answer_text
-
 class Project(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
@@ -64,8 +44,33 @@ class Pledge(models.Model):
         related_name = 'supporter_pledges'
     )
 
+class Faq(models.Model):
+    question_text = models.CharField(max_length=200)
+    answer_text = models.CharField(max_length= 200)
+    pub_date = models.DateTimeField('date published')
+    anonymous = models.BooleanField()
+    project = models.ForeignKey(
+        'Project',on_delete=models.CASCADE,
+        related_name='project_faq'
+    )
+    supporter = models.ForeignKey(
+        get_user_model(),
+        on_delete = models.CASCADE,
+        related_name = 'supporter_faq'
+    )
+
+    def __str__(self):
+        return self.question_text, self.answer_text
 
 
+class Milestone(models.Model):
+    title = models.CharField(max_length = 200)
+    description = models.TextField()
+    pub_date = models.DateTimeField()
+    project = models.ForeignKey(
+        'Project',on_delete=models.CASCADE,
+        related_name='project_milestone'
+    )
 
 
 
