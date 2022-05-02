@@ -24,6 +24,36 @@ class PledgeList(APIView):
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST)
 
+class PledgeDetail(APIView):
+    #   permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerorReadOnly]
+
+    def get_object(self, pk):
+        try:
+            pledge = Pledge.objects.get(pk=pk)
+            self.check_object_permissions(self.request,pledge)
+            return pledge
+
+        except Pledge.DoesNotExist:
+            raise Http404
+    
+    def get(self, request, pk):
+        pledge = self.get_object(pk)
+        serializer = PledgeDetailSerializer(project)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        pledge = self.get_object(pk)
+        data = request.data
+        serializer = PledgeDetailSerializer(
+            instance = pledge,
+            data = data,
+            partial = True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class ProjectList(APIView):
     
     # I can see the project list when loged off but I can't post/create a project unless logged in.
