@@ -11,6 +11,7 @@ class Tag(models.Model):
 
 class Project(models.Model):
     title = models.CharField(max_length=200)
+    tagline = models.TextField()
     description = models.TextField()
     goal = models.IntegerField()
     image = models.URLField()
