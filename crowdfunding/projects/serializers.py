@@ -72,6 +72,7 @@ class ProjectDetailSerializer(ProjectSerializer):
 
     def update(self, instance, validated_data):
         instance.title = validated_data.get('title', instance.title)
+        instance.tagline = validated_data.get('tagline', instance.tagline)
         instance.description = validated_data.get('description', instance.description)
         instance.goal = validated_data.get('goal', instance.goal)
         instance.image = validated_data.get('image', instance.image)
