@@ -49,7 +49,6 @@ class Faq(models.Model):
     question_text = models.CharField(max_length=200)
     answer_text = models.CharField(max_length= 200)
     pub_date = models.DateTimeField('date published')
-    anonymous = models.BooleanField()
     project = models.ForeignKey(
         'Project',on_delete=models.CASCADE,
         related_name='project_faq'

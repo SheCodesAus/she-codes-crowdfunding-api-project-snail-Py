@@ -14,15 +14,30 @@ class TagSerializer(serializers.Serializer):
 
 class FaqSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
-    project = serializers.PrimaryKeyRelatedField(read_only = True)
+    # project = serializers.PrimaryKeyRelatedField(read_only = True)
     question_text = serializers.CharField()
     answer_text = serializers.CharField()        
     pub_date = serializers.DateTimeField()
-    anonymous = serializers.BooleanField()
+    # supporter = serializers.ReadOnlyField(source='supporter.id')
     supporter =  serializers.PrimaryKeyRelatedField(queryset = CustomUser.objects.all())
+    def create(self, validated_data):
+        return Faq.objects.create(**validated_data)
+    
+    project_id = serializers.IntegerField()
 
     def create(self, validated_data):
         return Faq.objects.create(**validated_data)
+
+class FaqDetailSerializer(serializers.Serializer):
+
+    def update(self, instance, validated_data):
+        instance.question_text = validated_data.get('question_text', instance.question_text)
+        instance.answer_text = validated_data.get('answer_text', instance.answer_text)
+        instance.pub_data = validated_data.get('pub_date', instance.pub_date)
+        instance.supporter = validated_data.get('owner', instance.supporter)
+        instance.save()
+        return instance
+
 
 class PledgeSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
@@ -37,7 +52,6 @@ class PledgeSerializer(serializers.Serializer):
         return Pledge.objects.create(**validated_data)
 
 class PledgeDetailSerializer(serializers.Serializer):
-
     def update(self, instance, validated_data):
         instance.amount = validated_data.get('amount', instance.amount)
         instance.comment = validated_data.get('comment', instance.comment)
