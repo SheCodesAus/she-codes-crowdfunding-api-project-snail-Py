@@ -17,7 +17,6 @@ class Project(models.Model):
     image = models.URLField()
     is_open = models.BooleanField()
     date_created = models.DateTimeField(default=timezone.now, null = True, blank = True)
-    # date_created = models.DateTimeField
     date_closed = models.DateTimeField(null = True, blank = True)
     owner = models.ForeignKey(
         get_user_model(),

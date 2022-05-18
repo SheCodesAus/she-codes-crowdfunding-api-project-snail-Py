@@ -14,14 +14,13 @@ class TagSerializer(serializers.Serializer):
 
 class FaqSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
-    # project = serializers.PrimaryKeyRelatedField(read_only = True)
     question_text = serializers.CharField()
     answer_text = serializers.CharField()        
     pub_date = serializers.DateTimeField()
-    # supporter = serializers.ReadOnlyField(source='supporter.id')
-    supporter =  serializers.PrimaryKeyRelatedField(queryset = CustomUser.objects.all())
-    def create(self, validated_data):
-        return Faq.objects.create(**validated_data)
+    supporter = serializers.ReadOnlyField(source='supporter.id')
+    # supporter =  serializers.PrimaryKeyRelatedField(queryset = CustomUser.objects.all())
+    # def create(self, validated_data):
+    #     return Faq.objects.create(**validated_data)
     
     project_id = serializers.IntegerField()
 
@@ -83,6 +82,7 @@ class ProjectSerializer(serializers.Serializer):
 
 class ProjectDetailSerializer(ProjectSerializer):
     pledges = PledgeSerializer(many=True, read_only=True)
+    project_faq = FaqSerializer(many=True, read_only=True)
 
     def update(self, instance, validated_data):
         instance.title = validated_data.get('title', instance.title)
